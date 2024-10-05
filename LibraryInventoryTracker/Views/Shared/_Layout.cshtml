@@ -1,0 +1,43 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Demo Library</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/LibraryInventoryTracker.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="row">
+                @Html.ActionLink("Demo Library", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="row">
+                <div class="col-sm">
+                    @Html.ActionLink("Home", "Index", "Home")
+                </div>
+                <div class="col-sm">
+                    @Html.ActionLink("Register", "SignUp", "Home")
+                </div>
+                <div class="col-sm">
+                    @Html.ActionLink("Log In", "SignIn", "Home")
+                </div>
+                <div class="col-sm">
+                    @Html.ActionLink("Archive", "Archive", "Library")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - Adrian Tan</p>
+        </footer>
+    </div>
+    @RenderSection("scripts", required: false)
+</body>
+</html>
