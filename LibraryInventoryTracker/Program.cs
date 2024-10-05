@@ -1,41 +1,76 @@
 using LibraryInventoryTracker.Data;
+using LibraryInventoryTracker.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using Microsoft.Extensions.DependencyInjection;
 
 //Create SQL database for storing data to be searched
-String str = "CREATE DATABASE MyDatabase ON PRIMARY " +
- "(NAME = LibraryDB_Data, " +
- "FILENAME = 'C:\\LibraryDB_Data.mdf', " +
- "SIZE = 2MB, MAXSIZE = 10MB, FILEGROWTH = 10%)" +
- "LOG ON (NAME = LibraryDB_Log, " +
- "FILENAME = 'C:\\LibraryDB.ldf', " +
- "SIZE = 1MB, " +
- "MAXSIZE = 5MB, " +
- "FILEGROWTH = 10%)";
+SqlConnection ConnString1 = new SqlConnection(@"server=(LocalDB)\MSSQLLocalDB");
+ConnString1.Open();
 
-string ConnString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename='C:\\LibraryDB_Data.mdf'; Integrated Security=True;Connect Timeout=30;Encrypt=False";
+string sql = string.Format(@"
+    IF EXISTS(SELECT * FROM sys.databases WHERE name = 'Library')
+    BEGIN
+        DROP DATABASE [Library]
+    END
 
-using (SqlConnection myConn = new SqlConnection (ConnString)) {
-    SqlCommand myCommand = new SqlCommand(str, myConn);
-    try {
-        myConn.Open();
-        myCommand.ExecuteNonQuery();
-        Console.WriteLine("DataBase is Created Successfully");
-    } catch (System.Exception ex) {
-        Console.WriteLine("DataBase Creation Failed: " + ex.ToString());
-    }
+    BEGIN
+        CREATE DATABASE
+            [Library]
+        ON PRIMARY (
+        NAME=LibraryDB_data,
+        FILENAME = '{0}\LibraryDB_data.mdf'
+        )
+        LOG ON (
+            NAME=LibraryDB_log,
+            FILENAME = '{0}\LibraryDB_log.ldf'
+        )
+
+        DROP TABLE IF EXISTS Book
+
+        CREATE TABLE Book (
+            ID INTEGER PRIMARY KEY,
+            Title TEXT NOT NULL,
+            Author TEXT NOT NULL,
+            Description TEXT NOT NULL,
+            CoverImage TEXT NOT NULL,
+            Publisher TEXT NOT NULL,
+            PublicationDate TEXT NOT NULL,
+            Category TEXT NOT NULL,
+            ISBN TEXT NOT NULL,
+            PageCount INTEGER NOT NULL,
+            CheckedOut INTEGER DEFAULT 0
+        )
+    END",
+    @"C:\sqlite"
+);
+
+SqlCommand command = new SqlCommand(sql, ConnString1);
+
+try {
+    command.ExecuteNonQuery();
+    Console.WriteLine("DataBase is Created Successfully");
+} catch (System.Exception ex) {
+    Console.WriteLine("DataBase Creation Failed: " + ex.ToString());
 }
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddDbContext<LibraryInventoryTrackerContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("LibraryInventoryTrackerContext") ?? throw new InvalidOperationException("Connection string 'LibraryInventoryTrackerContext' not found.")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<LibraryInventoryTrackerContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("LibraryInventoryTrackerContext")));
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    
+    SeedData.Initialize(services);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
