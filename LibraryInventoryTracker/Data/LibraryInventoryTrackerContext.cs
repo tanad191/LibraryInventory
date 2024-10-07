@@ -15,5 +15,7 @@ namespace LibraryInventoryTracker.Data
         }
 
         public DbSet<LibraryInventoryTracker.Models.Book> Book { get; set; } = default!;
+        
+        public DbSet<LibraryInventoryTracker.Models.User> User { get; set; } = default!;
     }
 }

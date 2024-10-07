@@ -9,6 +9,7 @@
       "LibraryInventoryTracker/1.0.0": {
         "dependencies": {
           "EntityFramework": "6.5.1",
+          "Microsoft.Data.Sqlite": "8.0.8",
           "Microsoft.EntityFrameworkCore": "8.0.8",
           "Microsoft.EntityFrameworkCore.Design": "8.0.8",
           "Microsoft.EntityFrameworkCore.Sqlite": "8.0.8",
@@ -1135,6 +1136,12 @@
             "assetType": "native",
             "fileVersion": "5.1.1.0"
           }
+        }
+      },
+      "Microsoft.Data.Sqlite/8.0.8": {
+        "dependencies": {
+          "Microsoft.Data.Sqlite.Core": "8.0.8",
+          "SQLitePCLRaw.bundle_e_sqlite3": "2.1.6"
         }
       },
       "Microsoft.Data.Sqlite.Core/8.0.8": {
@@ -2635,6 +2642,13 @@
       "sha512": "sha512-wNGM5ZTQCa2blc9ikXQouybGiyMd6IHPVJvAlBEPtr6JepZEOYeDxGyprYvFVeOxlCXs7avridZQ0nYkHzQWCQ==",
       "path": "microsoft.data.sqlclient.sni.runtime/5.1.1",
       "hashPath": "microsoft.data.sqlclient.sni.runtime.5.1.1.nupkg.sha512"
+    },
+    "Microsoft.Data.Sqlite/8.0.8": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-Ao+kD9lZpZvvvfLHMR4/UviFGXaWhQ9AVT4fYMl62XWgIPuVIhZqLysmDNiXbsz6Pb87iyyElX2xSfigzKNZNg==",
+      "path": "microsoft.data.sqlite/8.0.8",
+      "hashPath": "microsoft.data.sqlite.8.0.8.nupkg.sha512"
     },
     "Microsoft.Data.Sqlite.Core/8.0.8": {
       "type": "package",

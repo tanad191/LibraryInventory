@@ -7,11 +7,11 @@ namespace LibraryInventoryTracker.Models
 {
     public enum Category
     {
-        CUSTOMER, LIBRARIAN
+        CUSTOMER = 1, LIBRARIAN = 2
     }
     public class User
     {
-        public int UserId { get; set; }
+        public int UserID { get; set; }
 
         public string UserName { get; set; }
         public string Password { get; set; }

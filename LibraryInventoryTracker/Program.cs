@@ -28,7 +28,7 @@ string sql = string.Format(@"
             FILENAME = '{0}\LibraryDB_log.ldf'
         )
 
-        DROP TABLE IF EXISTS Book
+        DROP TABLE IF EXISTS Book;
 
         CREATE TABLE Book (
             ID INTEGER PRIMARY KEY,
@@ -41,8 +41,19 @@ string sql = string.Format(@"
             Category TEXT NOT NULL,
             ISBN TEXT NOT NULL,
             PageCount INTEGER NOT NULL,
-            CheckedOut INTEGER DEFAULT 0
-        )
+            CheckedOut INTEGER DEFAULT 0,
+            CheckoutID INTEGER NULL
+        );
+
+        DROP TABLE IF EXISTS [User];
+
+        CREATE TABLE [User] (
+            UserID INTEGER PRIMARY KEY,
+            UserName TEXT NOT NULL,
+            Password TEXT NOT NULL,
+            Category INTEGER DEFAULT 1,
+            IsActive INTEGER DEFAULT 0
+        );
     END",
     @"C:\sqlite"
 );

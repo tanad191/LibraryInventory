@@ -10,22 +10,22 @@ using LibraryInventoryTracker.Models;
 
 namespace LibraryInventoryTracker.Controllers
 {
-    public class BookController : Controller
+    public class UserController : Controller
     {
         private readonly LibraryInventoryTrackerContext _context;
 
-        public BookController(LibraryInventoryTrackerContext context)
+        public UserController(LibraryInventoryTrackerContext context)
         {
             _context = context;
         }
 
-        // GET: Book
+        // GET: User
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Book.ToListAsync());
+            return View(await _context.User.ToListAsync());
         }
 
-        // GET: Book/Details/5
+        // GET: User/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +33,49 @@ namespace LibraryInventoryTracker.Controllers
                 return NotFound();
             }
 
-            var book = await _context.Book
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (book == null)
+            var user = await _context.User
+                .FirstOrDefaultAsync(m => m.UserID == id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(book);
+            return View(user);
         }
 
-        // GET: Book/Create
+        // GET: User/Create
         public IActionResult Create()
         {
+            List<SelectListItem> categoryList = new List<SelectListItem>();
+            categoryList.Add(new SelectListItem{Value="0",Text="Customer"});
+            categoryList.Add(new SelectListItem{Value="1",Text="Librarian"});
+
+            ViewData.Add("Categories", categoryList);
             return View();
         }
 
-        // POST: Book/Create
+        // POST: User/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Title,Author,Description,CoverImage,Publisher,PublicationDate,Category,ISBN,PageCount,CheckedOut")] Book book)
+        public async Task<IActionResult> Create([Bind("UserID,UserName,Password,Category,IsActive")] User user)
         {
+            List<SelectListItem> categoryList = new List<SelectListItem>();
+            categoryList.Add(new SelectListItem{Value="0",Text="Customer"});
+            categoryList.Add(new SelectListItem{Value="1",Text="Librarian"});
+
+            ViewData.Add("Categories", categoryList);
             if (ModelState.IsValid)
             {
-                _context.Add(book);
+                _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(book);
+            return View(user);
         }
 
-        // GET: Book/Edit/5
+        // GET: User/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +83,22 @@ namespace LibraryInventoryTracker.Controllers
                 return NotFound();
             }
 
-            var book = await _context.Book.FindAsync(id);
-            if (book == null)
+            var user = await _context.User.FindAsync(id);
+            if (user == null)
             {
                 return NotFound();
             }
-            return View(book);
+            return View(user);
         }
 
-        // POST: Book/Edit/5
+        // POST: User/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Title,Author,Description,CoverImage,Publisher,PublicationDate,Category,ISBN,PageCount,CheckedOut")] Book book)
+        public async Task<IActionResult> Edit(int id, [Bind("UserID,UserName,Password,Category,IsActive")] User user)
         {
-            if (id != book.ID)
+            if (id != user.UserID)
             {
                 return NotFound();
             }
@@ -97,12 +107,12 @@ namespace LibraryInventoryTracker.Controllers
             {
                 try
                 {
-                    _context.Update(book);
+                    _context.Update(user);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!BookExists(book.ID))
+                    if (!UserExists(user.UserID))
                     {
                         return NotFound();
                     }
@@ -113,45 +123,10 @@ namespace LibraryInventoryTracker.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(book);
-        }
-        
-        // POST: Book/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Checkout(int id)
-        {
-            if (id != book.ID)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BookExists(book.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(book);
+            return View(user);
         }
 
-        // GET: Book/Delete/5
+        // GET: User/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -159,34 +134,34 @@ namespace LibraryInventoryTracker.Controllers
                 return NotFound();
             }
 
-            var book = await _context.Book
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (book == null)
+            var user = await _context.User
+                .FirstOrDefaultAsync(m => m.UserID == id);
+            if (user == null)
             {
                 return NotFound();
             }
 
-            return View(book);
+            return View(user);
         }
 
-        // POST: Book/Delete/5
+        // POST: User/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var book = await _context.Book.FindAsync(id);
-            if (book != null)
+            var user = await _context.User.FindAsync(id);
+            if (user != null)
             {
-                _context.Book.Remove(book);
+                _context.User.Remove(user);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool BookExists(int id)
+        private bool UserExists(int id)
         {
-            return _context.Book.Any(e => e.ID == id);
+            return _context.User.Any(e => e.UserID == id);
         }
     }
 }

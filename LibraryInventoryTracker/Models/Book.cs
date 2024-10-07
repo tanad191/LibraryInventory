@@ -28,5 +28,7 @@ namespace LibraryInventoryTracker.Models
         public int PageCount { get; set; }
         
         public bool CheckedOut { get; set; }
+
+        public int? CheckoutID { get; set; }
     }
 }
