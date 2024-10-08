@@ -121,7 +121,7 @@ namespace LibraryInventoryTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Checkout(int id)
+        public async Task<IActionResult> Checkout(int id, [Bind("ID,Title,Author,Description,CoverImage,Publisher,PublicationDate,Category,ISBN,PageCount,CheckedOut")] Book book)
         {
             if (id != book.ID)
             {

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LibraryInventoryTracker")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c68ce5f8aa280664cd9679bfa3b343005ecfdefd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+02d3b3662075a491e14e768929dcac67cf1a347c")]
 [assembly: System.Reflection.AssemblyProductAttribute("LibraryInventoryTracker")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LibraryInventoryTracker")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -6,3 +6,12 @@
     <h1 class="display-4">Welcome to Demo Library!</h1>
     <p>This site was created using <a href="https://learn.microsoft.com/aspnet/core">ASP.NET Core</a>.</p>
 </div>
+
+<fieldset>
+    <legend>User Dashboard</legend>
+
+    @if (Session["UserName"] != null)
+    {
+        <text>Welcome @Session["UserName"].ToString()</text>
+    }
+</fieldset>
