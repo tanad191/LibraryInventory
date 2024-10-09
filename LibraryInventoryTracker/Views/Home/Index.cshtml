@@ -1,6 +1,8 @@
 ﻿@using Microsoft.AspNetCore.Http;
 @inject IHttpContextAccessor HttpContextAccessor
 
+@model IEnumerable<LibraryInventoryTracker.Models.Book>
+
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -10,11 +12,9 @@
     <p>This site was created using <a href="https://learn.microsoft.com/aspnet/core">ASP.NET Core</a>.</p>
 </div>
 
-<fieldset>
-    <legend>User Dashboard</legend>
+@if (@HttpContextAccessor.HttpContext.Session.GetString("UserName") != null)
+{
+    <h3>Welcome, @HttpContextAccessor.HttpContext.Session.GetString("UserName")!</h3>
+}
 
-    @if (@HttpContextAccessor.HttpContext.Session.GetString("UserName") != null)
-    {
-        <text>Welcome @HttpContextAccessor.HttpContext.Session.GetString("UserName")</text>
-    }
-</fieldset>
+@{Html.RenderPartial("~/Views/Book/Featured.cshtml", Model);}

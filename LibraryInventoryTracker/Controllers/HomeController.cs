@@ -23,7 +23,16 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
+        var FullBookList = _context.Book.ToList();
+        List<Book> FeaturedBooks = new List<Book>();
+        var rand = new Random();
+        foreach (Book book in FullBookList) {
+            if (rand.NextDouble() + 0.25 >= 0.5) {
+                FeaturedBooks.Add(book);
+            }
+            if (FeaturedBooks.Count == 3) { break; }
+        }
+        return View(FeaturedBooks);
     }
     
     public IActionResult SignIn()
@@ -31,17 +40,6 @@ public class HomeController : Controller
         return View("SignIn");
     }
     
-    public IActionResult SignUp()
-    {
-        List<SelectListItem> categoryList = new List<SelectListItem>();
-        categoryList.Add(new SelectListItem{Value="0",Text="Customer"});
-        categoryList.Add(new SelectListItem{Value="1",Text="Librarian"});
-
-        ViewData.Add("Category", categoryList);
-
-        return View("SignUp");
-    }
-
     [HttpPost]
     [ValidateAntiForgeryToken]
     public ActionResult SignIn(User user)

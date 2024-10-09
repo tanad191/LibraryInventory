@@ -42,7 +42,9 @@ string sql = string.Format(@"
             ISBN TEXT NOT NULL,
             PageCount INTEGER NOT NULL,
             CheckedOut INTEGER DEFAULT 0,
-            CheckoutID INTEGER NULL
+            CheckoutID INTEGER NULL,
+            CheckoutDate TEXT NULL,
+            DueDate TEXT NULL
         );
 
         DROP TABLE IF EXISTS [User];
@@ -55,7 +57,7 @@ string sql = string.Format(@"
             IsActive INTEGER DEFAULT 0
         );
     END",
-    @"C:\sqlite"
+    @"C:\temp"
 );
 
 SqlCommand command = new SqlCommand(sql, ConnString1);

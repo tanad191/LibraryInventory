@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -30,5 +30,9 @@ namespace LibraryInventoryTracker.Models
         public bool CheckedOut { get; set; }
 
         public int? CheckoutID { get; set; }
+
+        public DateTime? CheckoutDate { get; set; }
+
+        public DateTime? DueDate { get; set; }
     }
 }

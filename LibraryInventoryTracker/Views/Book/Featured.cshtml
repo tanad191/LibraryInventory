@@ -1,0 +1,44 @@
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+
+@model IEnumerable<LibraryInventoryTracker.Models.Book>
+
+<div class="widget">
+    <h2>Featured Books</h2>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.Title)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Author)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.CoverImage)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+    @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Author)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    <img src=@Html.DisplayFor(modelItem => item.CoverImage) alt=@Html.DisplayFor(modelItem => item.Title) width="250">
+                </td>
+            </tr>
+    }
+        </tbody>
+    </table>
+</div>

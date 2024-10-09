@@ -25,6 +25,39 @@ namespace LibraryInventoryTracker.Controllers
         {
             return View(await _context.Book.ToListAsync());
         }
+        
+        // GET: Book
+        public async Task<IActionResult> Index(string sortOrder)
+        {
+            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "Title" : "";
+            ViewBag.DateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
+            var books = from s in _context.Book
+                            select s;
+            switch (sortOrder)
+            {
+                case "Title":
+                    books = books.OrderByDescending(s => s.Title);
+                    break;
+                case "Author":
+                    books = books.OrderByDescending(s => s.Author);
+                    break;
+                case "Availability":
+                    books = from s in _context.Book
+                            select s;
+                    break;
+                default:
+                    books = books.OrderBy(s => s.ID);
+                    break;
+            }
+            return View(books.ToList());
+            return View(await _context.Book.ToListAsync());
+        }
+        
+        // GET: Book
+        public async Task<IActionResult> Featured()
+        {
+            return PartialView(await _context.Book.ToListAsync());
+        }
 
         // GET: Book/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -117,81 +150,78 @@ namespace LibraryInventoryTracker.Controllers
             return View(book);
         }
         
-        // POST: Book/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Checkout(int id, [Bind("ID,Title,Author,Description,CoverImage,Publisher,PublicationDate,Category,ISBN,PageCount,CheckedOut")] Book book)
+        // GET: Book/Checkout/5
+        public async Task<IActionResult> Checkout(int? id)
         {
-            if (id != book.ID)
-            {
-                return NotFound();
-            }
-            if (book.CheckedOut == true)
-            {
-                return View(book);
-            }
-
-            if (ModelState.IsValid)
-            {
-                int? currID = Int32.TryParse(HttpContext.Session.GetString("UserID"), out var tempVal) ? tempVal : null;
-                try
-                {
-                    book.CheckedOut=true;
-                    book.CheckoutID=currID;
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BookExists(book.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(book);
-        }
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Return(int id, [Bind("ID,Title,Author,Description,CoverImage,Publisher,PublicationDate,Category,ISBN,PageCount,CheckedOut")] Book book)
-        {
-            if (id != book.ID)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            var book = await _context.Book
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (book == null)
             {
-                try
-                {
-                    book.CheckedOut=false;
-                    book.CheckoutID=null;
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!BookExists(book.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
+
             return View(book);
         }
 
+        // POST: Book/Checkout/5
+        [HttpPost, ActionName("Checkout")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CheckoutConfirmed(int id)
+        {
+            var book = await _context.Book.FindAsync(id);
+            int? checkedoutID = Int32.TryParse(HttpContext.Session.GetString("UserID"), out var tempVal) ? tempVal : null;
+            if (book != null)
+            {
+                book.CheckedOut = true;
+                book.CheckoutID = checkedoutID;
+                book.CheckoutDate = DateTime.Now;
+                book.DueDate = DateTime.Now.AddDays(5);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Book/Return/5
+        public async Task<IActionResult> Return(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var book = await _context.Book
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (book == null)
+            {
+                return NotFound();
+            }
+
+            return View(book);
+        }
+
+        // POST: Book/Return/5
+        [HttpPost, ActionName("Return")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ReturnConfirmed(int id)
+        {
+            var book = await _context.Book.FindAsync(id);
+            if (book != null)
+            {
+                book.CheckedOut = false;
+                book.CheckoutID = null;
+                book.CheckoutDate = null;
+                book.DueDate = null;
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
 
         // GET: Book/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -230,5 +260,6 @@ namespace LibraryInventoryTracker.Controllers
         {
             return _context.Book.Any(e => e.ID == id);
         }
+        
     }
 }

@@ -43,7 +43,7 @@
                 @Html.DisplayNameFor(model => model.PageCount)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CheckedOut)
+                Availability
             </th>
             <th></th>
         </tr>
@@ -79,15 +79,29 @@
                 @Html.DisplayFor(modelItem => item.PageCount)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CheckoutID)
+                @if (@item?.CheckedOut == false) {
+                    <div class="col-sm">
+                                Available
+                                </div>
+                } else { @Html.DisplayFor(modelItem => item.CheckoutID) }
             </td>
             <td>
-                @if (@HttpContextAccessor.HttpContext.Session.GetString("Category") == "LIBRARIAN") {
-                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a>
-                }
                 <a asp-action="Details" asp-route-id="@item.ID">Details</a>
-                @if (@HttpContextAccessor.HttpContext.Session.GetString("Category") == "LIBRARIAN") {
-                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                @if (@HttpContextAccessor.HttpContext.Session.GetString("LoggedOn") == "True") {
+                    @if (@item?.CheckedOut == false) {
+                        <div class="col-sm">
+                            <a asp-action="Checkout" asp-route-id="@item?.ID">Check Out</a>
+                        </div>
+                    }
+                    @if (@HttpContextAccessor.HttpContext.Session.GetString("Category") == "LIBRARIAN") {
+                        @if (@item?.CheckedOut == true) {
+                            <div class="col-sm">
+                                <a asp-action="Return" asp-route-id="@item?.ID">Return</a>
+                            </div>
+                        }
+                        <a asp-action="Edit" asp-route-id="@item.ID">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                    }
                 }
             </td>
         </tr>
