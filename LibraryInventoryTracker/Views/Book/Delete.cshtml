@@ -1,4 +1,5 @@
 @model LibraryInventoryTracker.Models.Book
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
     ViewData["Title"] = "Delete";
@@ -72,10 +73,18 @@
             @Html.DisplayFor(model => model.CheckedOut)
         </dd>
     </dl>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="ID" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
-    </form>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="ID" />
+                <input type="submit" value="Delete" class="btn btn-danger" />
+            </form>
+        </div>
+        <div class="col-sm">
+            <a asp-action="Index">Back to List</a>
+        </div>
+    </div>
 </div>

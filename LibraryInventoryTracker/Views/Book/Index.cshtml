@@ -1,3 +1,6 @@
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+
 @model IEnumerable<LibraryInventoryTracker.Models.Book>
 
 @{
@@ -76,12 +79,16 @@
                 @Html.DisplayFor(modelItem => item.PageCount)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CheckedOut)
+                @Html.DisplayFor(modelItem => item.CheckoutID)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                @if (@HttpContextAccessor.HttpContext.Session.GetString("Category") == "LIBRARIAN") {
+                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a>
+                }
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+                @if (@HttpContextAccessor.HttpContext.Session.GetString("Category") == "LIBRARIAN") {
+                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                }
             </td>
         </tr>
 }

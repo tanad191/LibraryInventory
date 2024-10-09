@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryInventoryTracker.Data;
 using LibraryInventoryTracker.Models;
+using System.Security.Policy;
 
 namespace LibraryInventoryTracker.Controllers
 {
@@ -61,11 +63,6 @@ namespace LibraryInventoryTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UserID,UserName,Password,Category,IsActive")] User user)
         {
-            List<SelectListItem> categoryList = new List<SelectListItem>();
-            categoryList.Add(new SelectListItem{Value="0",Text="Customer"});
-            categoryList.Add(new SelectListItem{Value="1",Text="Librarian"});
-
-            ViewData.Add("Categories", categoryList);
             if (ModelState.IsValid)
             {
                 _context.Add(user);

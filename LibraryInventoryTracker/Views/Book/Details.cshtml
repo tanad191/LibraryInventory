@@ -1,3 +1,6 @@
+@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+
 @model LibraryInventoryTracker.Models.Book
 
 @{
@@ -72,9 +75,11 @@
         <div class="col-sm">
             <a asp-action="Checkout" asp-route-id="@Model?.ID">Check Out</a>
         </div>
-        <div class="col-sm">
-            <a asp-action="Edit" asp-route-id="@Model?.ID">Edit</a>
-        </div>
+        @if (@HttpContextAccessor.HttpContext.Session.GetString("Category") == "LIBRARIAN") {
+            <div class="col-sm">
+                <a asp-action="Edit" asp-route-id="@Model?.ID">Edit</a>
+            </div>
+        }
         <div class="col-sm">
             <a asp-action="Index">Back to List</a>
         </div>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -127,11 +128,18 @@ namespace LibraryInventoryTracker.Controllers
             {
                 return NotFound();
             }
+            if (book.CheckedOut == true)
+            {
+                return View(book);
+            }
 
             if (ModelState.IsValid)
             {
+                int? currID = Int32.TryParse(HttpContext.Session.GetString("UserID"), out var tempVal) ? tempVal : null;
                 try
                 {
+                    book.CheckedOut=true;
+                    book.CheckoutID=currID;
                     _context.Update(book);
                     await _context.SaveChangesAsync();
                 }
@@ -150,6 +158,40 @@ namespace LibraryInventoryTracker.Controllers
             }
             return View(book);
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Return(int id, [Bind("ID,Title,Author,Description,CoverImage,Publisher,PublicationDate,Category,ISBN,PageCount,CheckedOut")] Book book)
+        {
+            if (id != book.ID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    book.CheckedOut=false;
+                    book.CheckoutID=null;
+                    _context.Update(book);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!BookExists(book.ID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(book);
+        }
+
 
         // GET: Book/Delete/5
         public async Task<IActionResult> Delete(int? id)

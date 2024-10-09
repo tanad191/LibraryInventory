@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Http;
+@inject IHttpContextAccessor HttpContextAccessor
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -22,11 +25,17 @@
                     @Html.ActionLink("Register", "Create", "User")
                 </div>
                 <div class="col-sm">
-                    @Html.ActionLink("Log In", "SignIn", "Home")
+                    @Html.ActionLink("Sign In", "SignIn", "Home")
                 </div>
                 <div class="col-sm">
                     @Html.ActionLink("Archive", "Index", "Book")
                 </div>
+                @if (@HttpContextAccessor.HttpContext.Session.GetString("LoggedOn") != null)
+                {
+                    <div class="col-sm">
+                        @Html.ActionLink("Sign Out", "SignOut", "Home")
+                    </div>
+                }
             </div>
         </div>
     </div>
