@@ -21,36 +21,30 @@ namespace LibraryInventoryTracker.Controllers
         }
 
         // GET: Book
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Book.ToListAsync());
-        }
-        
-        // GET: Book
         public async Task<IActionResult> Index(string sortOrder)
         {
-            ViewBag.NameSortParm = String.IsNullOrEmpty(sortOrder) ? "Title" : "";
-            ViewBag.DateSortParm = sortOrder == "Date" ? "date_desc" : "Date";
-            var books = from s in _context.Book
+            ViewBag.TitleSortParm = String.IsNullOrEmpty(sortOrder) ? "Title" : "";
+            ViewBag.AuthorSortParm = String.IsNullOrEmpty(sortOrder) ? "Author" : "";
+            ViewBag.AvailableSortParm = String.IsNullOrEmpty(sortOrder) ? "Availability" : "";
+            var booksFull = from s in _context.Book
                             select s;
+            var books = booksFull;
             switch (sortOrder)
             {
                 case "Title":
-                    books = books.OrderByDescending(s => s.Title);
+                    books = booksFull.OrderBy(s => s.Title);
                     break;
                 case "Author":
-                    books = books.OrderByDescending(s => s.Author);
+                    books = booksFull.OrderBy(s => s.Author);
                     break;
                 case "Availability":
-                    books = from s in _context.Book
-                            select s;
+                    books = booksFull.Where(s => s.CheckedOut == false);
                     break;
                 default:
-                    books = books.OrderBy(s => s.ID);
+                    books = booksFull.OrderBy(s => s.ID);
                     break;
             }
-            return View(books.ToList());
-            return View(await _context.Book.ToListAsync());
+            return View(await books.ToListAsync());
         }
         
         // GET: Book

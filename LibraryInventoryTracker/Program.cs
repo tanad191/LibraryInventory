@@ -57,7 +57,7 @@ string sql = string.Format(@"
             IsActive INTEGER DEFAULT 0
         );
     END",
-    @"C:\temp"
+    @"C:\Temp"
 );
 
 SqlCommand command = new SqlCommand(sql, ConnString1);
