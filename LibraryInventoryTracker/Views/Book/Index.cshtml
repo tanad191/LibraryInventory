@@ -12,6 +12,12 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+@using (Html.BeginForm())
+{
+    <p>
+        Search books by title: @Html.TextBox("SearchString")
+        <input type="submit" value="Search" /></p>
+}
 <table class="table">
     <thead>
         <tr>

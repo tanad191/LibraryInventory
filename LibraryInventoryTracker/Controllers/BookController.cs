@@ -21,29 +21,41 @@ namespace LibraryInventoryTracker.Controllers
         }
 
         // GET: Book
-        public async Task<IActionResult> Index(string sortOrder)
+        public async Task<IActionResult> Index(string sortOrder, string searchString)
         {
+            //Set up search tags
             ViewBag.TitleSortParm = String.IsNullOrEmpty(sortOrder) ? "Title" : "";
             ViewBag.AuthorSortParm = String.IsNullOrEmpty(sortOrder) ? "Author" : "";
             ViewBag.AvailableSortParm = String.IsNullOrEmpty(sortOrder) ? "Availability" : "";
+            
+            //Get full book data from context and store in a dummy variable
             var booksFull = from s in _context.Book
                             select s;
-            var books = booksFull;
-            switch (sortOrder)
-            {
+            var books = booksFull; //Full database and data to present are stored separately in case we need to restore the full data
+
+            //Replace the value contained in the dummy variable with the filtered data and present the dummy variable - if no filters, the dummy variable has the same value as the full data
+            
+            //Sort by column
+            switch (sortOrder) {
                 case "Title":
-                    books = booksFull.OrderBy(s => s.Title);
+                    books = books.OrderBy(s => s.Title);
                     break;
                 case "Author":
-                    books = booksFull.OrderBy(s => s.Author);
+                    books = books.OrderBy(s => s.Author);
                     break;
                 case "Availability":
-                    books = booksFull.Where(s => s.CheckedOut == false);
+                    books = books.Where(s => s.CheckedOut == false);
                     break;
                 default:
-                    books = booksFull.OrderBy(s => s.ID);
+                    books = books.OrderBy(s => s.ID);
                     break;
             }
+
+            //Search by title
+            if (!String.IsNullOrEmpty(searchString)) {
+                books = books.Where(s => s.Title.Contains(searchString));
+            }
+
             return View(await books.ToListAsync());
         }
         
