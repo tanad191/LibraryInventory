@@ -15,16 +15,23 @@ namespace LibraryInventoryTracker.Controllers
     public class UserController : Controller
     {
         private readonly LibraryInventoryTrackerContext _context;
+        private List<string> Usernames;
 
         public UserController(LibraryInventoryTrackerContext context)
         {
             _context = context;
+            Usernames = (from s in _context.User
+                select s.UserName).ToList<string>();
         }
 
         // GET: User
         public async Task<IActionResult> Index()
         {
-            return View(await _context.User.ToListAsync());
+            if (HttpContext.Session.GetString("LoggedOn") == "True" && HttpContext.Session.GetString("Category") == "LIBRARIAN") {
+                return View(await _context.User.ToListAsync());
+            } else {
+                return RedirectToAction("Error", "Home"); //redir to list
+            }
         }
 
         // GET: User/Details/5
@@ -65,6 +72,9 @@ namespace LibraryInventoryTracker.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (Usernames.Contains(user.UserName)) { //Ensures that duplicate ISBNs are not allowed
+                        ViewBag.ErrorMessage = string.Format("ERROR: An account already exists with the username {0}.",nameof(user.UserName));
+                }
                 _context.Add(user);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -99,13 +109,25 @@ namespace LibraryInventoryTracker.Controllers
             {
                 return NotFound();
             }
+            var prevUser = from s in _context.User.AsNoTracking()
+                            where s.UserID == id
+                            select s;
+
+            //Create a list of all existing ISBNs EXCEPT the one for the book being edited
+            List<string> UsernamesEdited = Usernames;
+            UsernamesEdited.Remove(prevUser.First().UserName);
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(user);
-                    await _context.SaveChangesAsync();
+                    if (UsernamesEdited.Contains(user.UserName)) { //Ensures that duplicate ISBNs are not allowed
+                        ViewBag.ErrorMessage = string.Format("ERROR IN EDITING ACCOUNT {0}: An account with this username already exists.",nameof(user.UserID));
+                        return View(user);
+                    } else {
+                        _context.Update(user);
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {

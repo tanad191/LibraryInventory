@@ -15,7 +15,7 @@ public class HomeController : Controller
     private readonly LibraryInventoryTrackerContext _context;
     private readonly ILogger<HomeController> _logger;
 
-    public HomeController(ILogger<HomeController> logger, LibraryInventoryTrackerContext context = null)
+    public HomeController(ILogger<HomeController> logger, LibraryInventoryTrackerContext context)
     {
         _logger = logger;
         _context = context;
