@@ -105,34 +105,6 @@ public static class SeedData
                     CheckedOut = false
                 }
             );
-            // // Look for any users.
-            // if (context.User.Any())
-            // {
-            //     return;   // DB has been seeded
-            // }
-            // context.User.AddRange(
-            //     new User
-            //     {
-            //         UserID = 0,
-            //         UserName = "test1",
-            //         Password = "12345",
-            //         Category = Category.LIBRARIAN
-            //     },                
-            //     new User
-            //     {
-            //         UserID = 1,
-            //         UserName = "test2",
-            //         Password = "54321",
-            //         Category = Category.CUSTOMER
-            //     },                
-            //     new User
-            //     {
-            //         UserID = 2,
-            //         UserName = "test3",
-            //         Password = "abcde",
-            //         Category = Category.CUSTOMER
-            //     }
-            // );
             context.SaveChanges();
         }
     }

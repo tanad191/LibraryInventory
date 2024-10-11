@@ -94,13 +94,20 @@ namespace LibraryInventoryTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Title,Author,Description,CoverImage,Publisher,PublicationDate,Category,ISBN,PageCount,CheckedOut")] Book book)
+        public async Task<IActionResult> Create([Bind("ID,Title,Author,Description,CoverImage,Publisher,PublicationDate,Category,ISBN,PageCount")] Book book)
         {
+            List<string> ISBNs = (from s in _context.Book
+                                    select s.ISBN).ToList<string>();
+
             if (ModelState.IsValid)
             {
-                _context.Add(book);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ISBNs.Contains(book.ISBN)) { //Ensures that duplicate ISBNs are not allowed
+                    ModelState.AddModelError(nameof(book.ISBN), "A book with this ISBN already exists.");
+                } else {
+                    _context.Add(book);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
             return View(book);
         }
@@ -126,19 +133,31 @@ namespace LibraryInventoryTracker.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Title,Author,Description,CoverImage,Publisher,PublicationDate,Category,ISBN,PageCount,CheckedOut")] Book book)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Title,Author,Description,CoverImage,Publisher,PublicationDate,Category,ISBN,PageCount")] Book book)
         {
             if (id != book.ID)
             {
                 return NotFound();
             }
 
+            //Create a list of all existing ISBNs EXCEPT the one for the book being edited
+            List<string> ISBNs = (from s in _context.Book
+                                    select s.ISBN).ToList<string>();
+            var prevBook = await _context.Book
+                .FirstOrDefaultAsync(m => m.ID == id);
+            ISBNs.Remove(prevBook.ISBN);
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(book);
-                    await _context.SaveChangesAsync();
+                    if (ISBNs.Contains(book.ISBN)) { //Ensures that duplicate ISBNs are not allowed
+                        ModelState.AddModelError(nameof(book.ISBN), "A book with this ISBN already exists.");
+                        return View(book);
+                    } else {
+                        _context.Update(book);
+                        await _context.SaveChangesAsync();
+                    }
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -254,7 +273,11 @@ namespace LibraryInventoryTracker.Controllers
         {
             var book = await _context.Book.FindAsync(id);
             if (book != null)
-            {
+            {                    
+                if (book.CheckedOut == true) { //Ensures that books cannot be removed from the database if they've been checked out without being returned
+                    ModelState.AddModelError(nameof(book.Title), "This book has been checked out. Please ensure that it is returned before removing it from the database.");
+                    return View(book);
+                }
                 _context.Book.Remove(book);
             }
 

@@ -67,6 +67,26 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.PageCount)
         </dd>
+        @if (@Model?.CheckedOut == true) {
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.CheckoutID)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.CheckoutID)
+            </dd>
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.CheckoutDate)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.CheckoutDate)
+            </dd>
+            <dt class = "col-sm-2">
+                @Html.DisplayNameFor(model => model.DueDate)
+            </dt>
+            <dd class = "col-sm-10">
+                @Html.DisplayFor(model => model.DueDate)
+            </dd>
+        }
     </dl>
 </div>
 
@@ -78,7 +98,7 @@
                     <a asp-action="Checkout" asp-route-id="@Model?.ID">Check Out</a>
                 </div>
             } else if (@HttpContextAccessor.HttpContext.Session.GetString("Category") == "LIBRARIAN") {
-                @if (@Model?.CheckedOut == false) {
+                @if (@Model?.CheckedOut == true) {
                     <div class="col-sm">
                         <a asp-action="Return" asp-route-id="@Model?.ID">Return</a>
                     </div>
