@@ -82,3 +82,13 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    @if (ViewBag.ErrorMessage != null) {
+        <script type="text/javascript">
+            window.onload = function () {
+                alert("@ViewBag.ErrorMessage");
+            };
+        </script>
+    }
+}

@@ -14,10 +14,13 @@ namespace LibraryInventoryTracker.Controllers
     public class BookController : Controller
     {
         private readonly LibraryInventoryTrackerContext _context;
+        private List<string> ISBNs;
 
         public BookController(LibraryInventoryTrackerContext context)
         {
             _context = context;
+            ISBNs = (from s in _context.Book
+                select s.ISBN).ToList<string>();
         }
 
         // GET: Book
@@ -96,14 +99,13 @@ namespace LibraryInventoryTracker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,Title,Author,Description,CoverImage,Publisher,PublicationDate,Category,ISBN,PageCount")] Book book)
         {
-            List<string> ISBNs = (from s in _context.Book
-                                    select s.ISBN).ToList<string>();
-
             if (ModelState.IsValid)
             {
                 if (ISBNs.Contains(book.ISBN)) { //Ensures that duplicate ISBNs are not allowed
-                    ModelState.AddModelError(nameof(book.ISBN), "A book with this ISBN already exists.");
+                        ViewBag.ErrorMessage = string.Format("ERROR IN CREATING BOOK {0}: A book with this ISBN already exists.",nameof(book.ISBN));
                 } else {
+                    ViewBag.ErrorMessage = null;
+                    book.CheckedOut = false;
                     _context.Add(book);
                     await _context.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
@@ -139,22 +141,28 @@ namespace LibraryInventoryTracker.Controllers
             {
                 return NotFound();
             }
+            
+            var prevBook = from s in _context.Book.AsNoTracking()
+                            where s.ID == id
+                            select s;
 
             //Create a list of all existing ISBNs EXCEPT the one for the book being edited
-            List<string> ISBNs = (from s in _context.Book
-                                    select s.ISBN).ToList<string>();
-            var prevBook = await _context.Book
-                .FirstOrDefaultAsync(m => m.ID == id);
-            ISBNs.Remove(prevBook.ISBN);
+            List<string> ISBNsEdited = ISBNs;
+            ISBNsEdited.Remove(prevBook.First().ISBN);
 
             if (ModelState.IsValid)
             {
                 try
                 {
-                    if (ISBNs.Contains(book.ISBN)) { //Ensures that duplicate ISBNs are not allowed
-                        ModelState.AddModelError(nameof(book.ISBN), "A book with this ISBN already exists.");
+                    if (ISBNsEdited.Contains(book.ISBN)) { //Ensures that duplicate ISBNs are not allowed
+                        ViewBag.ErrorMessage = string.Format("ERROR IN EDITING BOOK {0}: A book with this ISBN already exists.",nameof(book.ISBN));
                         return View(book);
                     } else {
+                        if (prevBook.First().CheckedOut) { //Ensures that checked-out books can't be edited
+                            ViewBag.ErrorMessage = string.Format("ERROR IN EDITING BOOK {0}: This book has been checked out. Please ensure that it is returned before editing it.",nameof(book.ISBN));
+                            return View(book);
+                        }
+                        ViewBag.ErrorMessage = null;
                         _context.Update(book);
                         await _context.SaveChangesAsync();
                     }
@@ -275,9 +283,10 @@ namespace LibraryInventoryTracker.Controllers
             if (book != null)
             {                    
                 if (book.CheckedOut == true) { //Ensures that books cannot be removed from the database if they've been checked out without being returned
-                    ModelState.AddModelError(nameof(book.Title), "This book has been checked out. Please ensure that it is returned before removing it from the database.");
+                    ViewBag.ErrorMessage = string.Format("ERROR IN DELETING BOOK {0}: This book has been checked out. Please ensure that it is returned before removing it from the database.",nameof(book.ISBN));
                     return View(book);
                 }
+                ViewBag.ErrorMessage = null;
                 _context.Book.Remove(book);
             }
 
